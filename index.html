@@ -1,229 +1,451 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>LeaveDesk</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #1e3a5f;
-    }
-
-    /* ── SPLASH SCREEN ── */
-    #splash {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #7c3aed 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.5s ease;
-    }
-
-    #splash.hide {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .splash-card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      padding: 44px 40px;
-      text-align: center;
-      max-width: 320px;
-      width: 90%;
-    }
-
-    .splash-icon {
-      width: 72px;
-      height: 72px;
-      background: white;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-      50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-    }
-
-    .splash-title {
-      color: white;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      font-family: system-ui, -apple-system, sans-serif;
-      margin-bottom: 6px;
-    }
-
-    .splash-sub {
-      color: rgba(255,255,255,0.65);
-      font-size: 14px;
-      font-family: system-ui, -apple-system, sans-serif;
-      margin-bottom: 32px;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background: white;
-      border-radius: 2px;
-      width: 0%;
-      animation: load 2.5s ease forwards;
-    }
-
-    @keyframes load {
-      0%   { width: 0%; }
-      40%  { width: 60%; }
-      70%  { width: 80%; }
-      90%  { width: 92%; }
-      100% { width: 92%; }
-    }
-
-    .splash-status {
-      color: rgba(255,255,255,0.5);
-      font-size: 12px;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    /* ── ERROR STATE ── */
-    #errorBox {
-      display: none;
-      background: rgba(220, 38, 38, 0.1);
-      border: 1px solid rgba(220, 38, 38, 0.3);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    #errorBox p {
-      color: #fca5a5;
-      font-size: 13px;
-      font-family: system-ui, sans-serif;
-      margin-bottom: 12px;
-    }
-
-    #errorBox a {
-      display: inline-block;
-      background: white;
-      color: #1e3a5f;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: system-ui, sans-serif;
-    }
-
-    /* ── IFRAME ── */
-    #appFrame {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>LeaveDesk</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2563eb;--blue-dark:#1d4ed8;--blue-light:#eff6ff;
+  --green:#059669;--green-light:#ecfdf5;
+  --amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;
+  --gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+  --white:#ffffff;
+  --radius:12px;--radius-lg:18px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-xl:0 20px 25px rgba(0,0,0,.1),0 10px 10px rgba(0,0,0,.04);
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--gray-50);color:var(--gray-900);min-height:100vh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:var(--font)}
+#topBar{position:fixed;top:0;left:0;width:0;height:3px;background:linear-gradient(90deg,var(--blue),#7c3aed);z-index:99999;transition:width .3s ease;border-radius:0 2px 2px 0}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#1d4ed8 100%);padding:20px;position:relative;overflow:hidden}
+#loginScreen::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.05) 0%,transparent 50%),radial-gradient(circle at 70% 70%,rgba(99,102,241,.2) 0%,transparent 50%)}
+.login-box{background:var(--white);border-radius:24px;padding:44px 40px;width:100%;max-width:420px;box-shadow:var(--shadow-xl);position:relative;z-index:1}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .logo-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--blue),#7c3aed);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+.login-logo h1{font-size:26px;font-weight:800;color:var(--gray-900);letter-spacing:-.5px}
+.login-logo p{font-size:14px;color:var(--gray-400);margin-top:4px}
+.role-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:28px;background:var(--gray-100);padding:5px;border-radius:10px}
+.role-tab{padding:10px;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--gray-600);background:transparent}
+.role-tab.active{background:var(--white);color:var(--blue);box-shadow:var(--shadow)}
+.login-form{display:none}
+.login-form.show{display:block;animation:fadeSlide .25s ease}
+.form-label{font-size:13px;font-weight:600;color:var(--gray-600);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:15px;transition:all .2s;background:var(--gray-50);margin-bottom:16px}
+.form-input:focus{outline:none;border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),#7c3aed);color:var(--white);border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.4)}
+.btn-login:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.login-error{background:var(--red-light);color:var(--red);border:1px solid #fecaca;border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;margin-bottom:16px;font-weight:500;display:none}
+.login-error.show{display:block}
+.login-hint{font-size:12px;color:var(--gray-400);text-align:center;margin-top:14px}
+#app{display:none}
+#app.show{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 24px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:60px}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--gray-900)}
+.brand-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--blue),#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.user-badge{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--gray-100);border-radius:20px;font-size:13px;font-weight:600;color:var(--gray-700)}
+.user-dot{width:8px;height:8px;background:var(--green);border-radius:50%}
+.btn-logout{padding:7px 14px;border:1.5px solid var(--gray-200);background:var(--white);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--gray-600);cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--red);color:var(--red);background:var(--red-light)}
+.nav-tabs{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 24px;display:flex;gap:4px;overflow-x:auto}
+.nav-tab{padding:14px 18px;border:none;background:transparent;font-size:14px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;margin-bottom:-1px;white-space:nowrap}
+.nav-tab:hover{color:var(--gray-800)}
+.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.page{display:none;animation:fadeSlide .25s ease}
+.page.active{display:block}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.content{max-width:820px;margin:0 auto;padding:28px 20px 60px}
+.content.wide{max-width:1120px}
+.page-header{margin-bottom:24px}
+.page-header h2{font-size:22px;font-weight:800;color:var(--gray-900);margin-bottom:4px}
+.page-header p{font-size:14px;color:var(--gray-400)}
+.card{background:var(--white);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow);border:1px solid var(--gray-200);margin-bottom:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.card-title{font-size:15px;font-weight:700;color:var(--gray-900)}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.action-card{background:var(--white);border-radius:var(--radius-lg);padding:28px 22px;text-align:center;border:1.5px solid var(--gray-200);cursor:pointer;transition:all .25s;display:block;width:100%;box-shadow:var(--shadow)}
+.action-card:hover{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.08),var(--shadow-md);transform:translateY(-2px)}
+.action-card .ac-icon{width:56px;height:56px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+.ac-blue .ac-icon{background:var(--blue-light)}
+.ac-green .ac-icon{background:var(--green-light)}
+.action-card h3{font-size:16px;font-weight:700;color:var(--gray-900);margin-bottom:6px}
+.action-card p{font-size:13px;color:var(--gray-500);line-height:1.5}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--white);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);border:1px solid var(--gray-200);text-align:center}
+.stat-card .sv{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
+.stat-card .sl{font-size:12px;color:var(--gray-500);font-weight:500}
+.sv-all{color:var(--gray-800)}.sv-pend{color:var(--amber)}.sv-appr{color:var(--green)}.sv-rej{color:var(--red)}
+.balance-card{background:linear-gradient(135deg,var(--blue) 0%,#7c3aed 100%);border-radius:var(--radius-lg);padding:22px;color:var(--white);margin-bottom:20px;display:none;box-shadow:0 8px 24px rgba(37,99,235,.3)}
+.balance-card .bc-name{font-size:13px;opacity:.8;margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.bal-nums{display:grid;grid-template-columns:repeat(3,1fr)}
+.bal-num-item{text-align:center}
+.bal-num-item:not(:last-child){border-right:1px solid rgba(255,255,255,.2)}
+.bal-n{font-size:32px;font-weight:800;line-height:1}
+.bal-l{font-size:11px;opacity:.75;margin-top:5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.fg{margin-bottom:18px}
+.fg label{display:block;font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:6px}
+.req{color:var(--red);margin-left:2px}
+.fi{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:14px;transition:all .2s;background:var(--white);color:var(--gray-900)}
+.fi:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea.fi{resize:vertical;min-height:80px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn{padding:11px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#7c3aed);color:var(--white);width:100%;justify-content:center;padding:13px;font-size:15px}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.35)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-sm{padding:7px 13px;font-size:12px;font-weight:700;border-radius:6px;border:none;cursor:pointer;transition:all .2s}
+.btn-approve{background:var(--green-light);color:var(--green)}.btn-approve:hover{background:#d1fae5}
+.btn-reject{background:var(--red-light);color:var(--red)}.btn-reject:hover{background:#fee2e2}
+.btn-cancel-leave{background:var(--amber-light);color:var(--amber)}.btn-cancel-leave:hover{background:#fde68a}
+.btn-outline{background:transparent;border:1.5px solid var(--gray-200);color:var(--gray-600);padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.btn-refresh{background:var(--green-light);color:var(--green);border:none;padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-refresh:hover{background:#d1fae5}
+.alert{padding:13px 16px;border-radius:var(--radius-sm);margin-bottom:18px;font-size:14px;display:none;align-items:flex-start;gap:10px;font-weight:500;line-height:1.5}
+.alert.show{display:flex}
+.alert-success{background:var(--green-light);color:#065f46;border:1px solid #a7f3d0}
+.alert-error{background:var(--red-light);color:#991b1b;border:1px solid #fecaca}
+.alert-info{background:var(--blue-light);color:#1e40af;border:1px solid #bfdbfe}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filter-bar label{font-size:13px;font-weight:600;color:var(--gray-600);white-space:nowrap}
+.filter-bar select{width:auto;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px;background:var(--white)}
+.tbl-wrap{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);overflow:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px}
+th{background:var(--gray-50);color:var(--gray-600);padding:12px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1.5px solid var(--gray-200)}
+td{padding:13px 14px;border-bottom:1px solid var(--gray-100);vertical-align:middle;color:var(--gray-700)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--gray-50)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.b-pending{background:#fef9c3;color:#854d0e}.b-pending::before{background:var(--amber)}
+.b-approved{background:#dcfce7;color:#166534}.b-approved::before{background:var(--green)}
+.b-rejected{background:#fee2e2;color:#991b1b}.b-rejected::before{background:var(--red)}
+.b-cancelled{background:var(--gray-100);color:var(--gray-500)}.b-cancelled::before{background:var(--gray-400)}
+.today-strip{background:linear-gradient(135deg,var(--green),#0d9488);border-radius:var(--radius-lg);padding:18px 22px;color:var(--white);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.today-strip .ts-title{font-size:13px;opacity:.85;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.today-strip .ts-count{font-size:36px;font-weight:800;line-height:1}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:rgba(255,255,255,.18);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:430px;box-shadow:var(--shadow-xl);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-size:17px;font-weight:800;margin-bottom:18px;color:var(--gray-900)}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--gray-400)}
+.empty-state .es-icon{font-size:44px;margin-bottom:12px;opacity:.6}
+.empty-state p{font-size:15px;font-weight:600;margin-bottom:4px;color:var(--gray-500)}
+.empty-state small{font-size:13px}
+@media(max-width:640px){
+  .home-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+  .nav-tab{padding:12px 10px;font-size:13px}
+  .topbar{padding:0 16px}
+  .content{padding:20px 16px 60px}
+  .login-box{padding:32px 24px}
+}
+</style>
 </head>
 <body>
-
-  <!-- Splash screen shown while app loads -->
-  <div id="splash">
-    <div class="splash-card">
-      <div class="splash-icon">🗓️</div>
-      <div class="splash-title">LeaveDesk</div>
-      <div class="splash-sub">Employee Holiday Management</div>
-      <div class="progress-track">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div class="splash-status" id="statusText">Connecting to workspace...</div>
-
-      <!-- Error fallback shown if iframe fails -->
-      <div id="errorBox">
-        <p>Having trouble loading? Tap below to open directly.</p>
-        <a id="directLink" href="#" target="_blank">Open LeaveDesk App</a>
-      </div>
+<div id="topBar"></div>
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">🗓️</div>
+      <h1>LeaveDesk</h1>
+      <p id="loginCompanyName">Employee Holiday Management</p>
+    </div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole('employee')">👤 Employee</button>
+      <button class="role-tab" onclick="setRole('admin')">🛡️ Admin</button>
+    </div>
+    <div id="loginError" class="login-error"></div>
+    <div id="formEmployee" class="login-form show">
+      <label class="form-label">Employee ID</label>
+      <input class="form-input" id="empId" placeholder="e.g. EMP001" autocomplete="off">
+      <label class="form-label">PIN</label>
+      <input class="form-input" id="empPin" type="password" placeholder="Your 4-digit PIN" maxlength="6">
+      <button class="btn-login" id="btnEmpLogin" onclick="doLogin('employee')">Sign In →</button>
+      <p class="login-hint">Ask your admin for your Employee ID and PIN</p>
+    </div>
+    <div id="formAdmin" class="login-form">
+      <label class="form-label">Admin PIN</label>
+      <input class="form-input" id="adminPin" type="password" placeholder="Admin PIN" maxlength="8">
+      <button class="btn-login" id="btnAdminLogin" onclick="doLogin('admin')">Sign In as Admin →</button>
+      <p class="login-hint">Default PIN is set in the Config sheet</p>
     </div>
   </div>
-
-  <!-- The actual app runs here — Google Drive CANNOT intercept this -->
-  <iframe
-    id="appFrame"
-    src="https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec"
-    allow="same-origin"
-    allowfullscreen
-    onload="onAppLoaded()"
-    onerror="onAppError()">
-  </iframe>
-
-  <script>
-    var APP_URL = "https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec";
-    var loaded  = false;
-    var timeout = null;
-
-    // Set the fallback direct link
-    document.getElementById('directLink').href = APP_URL;
-
-    // Called when iframe finishes loading
-    function onAppLoaded() {
-      if (loaded) return;
-      loaded = true;
-      clearTimeout(timeout);
-
-      document.getElementById('statusText').textContent = 'Ready!';
-      document.getElementById('progressBar').style.animation = 'none';
-      document.getElementById('progressBar').style.width = '100%';
-
-      // Hide splash after short delay so progress bar completes
-      setTimeout(function () {
-        document.getElementById('splash').classList.add('hide');
-        // Remove splash from DOM after fade
-        setTimeout(function () {
-          var s = document.getElementById('splash');
-          if (s) s.remove();
-        }, 600);
-      }, 400);
-    }
-
-    // Called if iframe fails
-    function onAppError() {
-      document.getElementById('statusText').textContent = 'Connection issue';
-      document.getElementById('errorBox').style.display = 'block';
-    }
-
-    // Show error fallback if app takes too long (15 seconds)
-    timeout = setTimeout(function () {
-      if (!loaded) {
-        document.getElementById('statusText').textContent = 'Taking longer than expected...';
-        document.getElementById('errorBox').style.display = 'block';
-      }
-    }, 15000);
-  </script>
-
+</div>
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand"><div class="brand-icon">🗓️</div><span>LeaveDesk</span></div>
+    <div class="topbar-right">
+      <div class="user-badge"><div class="user-dot"></div><span id="userBadgeName">User</span></div>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="nav-tabs" id="navTabs"></div>
+  <div id="page-home" class="page"></div>
+  <div id="page-apply" class="page"></div>
+  <div id="page-history" class="page"></div>
+  <div id="page-admin" class="page"></div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Confirm Action</h3>
+    <div class="fg">
+      <label class="form-label">Your Name <span class="req">*</span></label>
+      <input class="fi" id="approverName" placeholder="Who is approving/rejecting?">
+    </div>
+    <div class="fg">
+      <label class="form-label">Remarks <span style="color:var(--gray-400)">(optional)</span></label>
+      <textarea class="fi" id="modalRemarks" rows="3" placeholder="Add notes..."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn" id="confirmBtn" onclick="doModalAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+<script>
+var API_URL="https://script.google.com/macros/s/AKfycbyzeN-P7u_0bgKog8RQxvsD-fvjQKQUWbq3vlagM02ezRniuNYeb59I7N9q7x2L05Rk/exec";
+function api(action,params){
+  var body=Object.assign({action:action},params||{});
+  return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})
+    .then(function(res){if(!res.ok)throw new Error('Network error: '+res.status);return res.json();});
+}
+var SESSION={role:null,id:null,name:null,department:null,companyName:'LeaveDesk'};
+var _recordId='',_action='';
+function startLoad(){var b=document.getElementById('topBar');b.style.width='0';b.style.transition='none';setTimeout(function(){b.style.transition='width 2s ease';b.style.width='80%';},10);}
+function stopLoad(){var b=document.getElementById('topBar');b.style.transition='width .2s ease';b.style.width='100%';setTimeout(function(){b.style.width='0';b.style.transition='none';},400);}
+var loginRole='employee';
+function setRole(r){
+  loginRole=r;
+  document.querySelectorAll('.role-tab').forEach(function(b,i){b.classList.toggle('active',(r==='employee'&&i===0)||(r==='admin'&&i===1));});
+  document.getElementById('formEmployee').classList.toggle('show',r==='employee');
+  document.getElementById('formAdmin').classList.toggle('show',r==='admin');
+  document.getElementById('loginError').classList.remove('show');
+}
+function doLogin(type){
+  document.getElementById('loginError').classList.remove('show');
+  var pin='',identifier='';
+  if(type==='admin'){
+    pin=document.getElementById('adminPin').value.trim();
+    if(!pin){showLoginErr('Please enter the Admin PIN.');return;}
+    var btn=document.getElementById('btnAdminLogin');
+    btn.disabled=true;btn.textContent='Signing in...';startLoad();
+    api('validateLogin',{type:'admin',identifier:'',pin:pin})
+      .then(function(r){stopLoad();btn.disabled=false;btn.textContent='Sign In as Admin →';handleLoginResult(r);})
+      .catch(function(){stopLoad();btn.disabled=false;btn.textContent='Sign In as Admin →';showLoginErr('Connection error. Please try again.');});
+  }else{
+    identifier=document.getElementById('empId').value.trim();
+    pin=document.getElementById('empPin').value.trim();
+    if(!identifier){showLoginErr('Please enter your Employee ID.');return;}
+    if(!pin){showLoginErr('Please enter your PIN.');return;}
+    var btn2=document.getElementById('btnEmpLogin');
+    btn2.disabled=true;btn2.textContent='Signing in...';startLoad();
+    api('validateLogin',{type:'employee',identifier:identifier,pin:pin})
+      .then(function(r){stopLoad();btn2.disabled=false;btn2.textContent='Sign In →';handleLoginResult(r);})
+      .catch(function(){stopLoad();btn2.disabled=false;btn2.textContent='Sign In →';showLoginErr('Connection error. Please try again.');});
+  }
+}
+function showLoginErr(msg){var el=document.getElementById('loginError');el.textContent=msg;el.classList.add('show');}
+function handleLoginResult(res){
+  if(!res.success){showLoginErr(res.message);return;}
+  SESSION.role=res.role;SESSION.id=res.id||'ADMIN';SESSION.name=res.name;
+  SESSION.department=res.department||'';SESSION.companyName=res.companyName||'LeaveDesk';
+  document.getElementById('loginCompanyName').textContent=SESSION.companyName;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').classList.add('show');
+  document.getElementById('userBadgeName').textContent=SESSION.name+(SESSION.role==='admin'?' (Admin)':'');
+  buildNav();
+  if(SESSION.role==='admin')showPage('admin');else showPage('home');
+}
+function logout(){
+  SESSION={role:null,id:null,name:null,department:null,companyName:'LeaveDesk'};
+  document.getElementById('loginScreen').style.display='';
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('empId').value='';document.getElementById('empPin').value='';
+  document.getElementById('adminPin').value='';document.getElementById('loginError').classList.remove('show');
+}
+function buildNav(){
+  var nav=document.getElementById('navTabs');nav.innerHTML='';
+  var tabs=SESSION.role==='admin'
+    ?[{id:'admin',label:'🛡️ Dashboard & Leaves'}]
+    :[{id:'home',label:'🏠 Home'},{id:'apply',label:'📝 Apply Leave'},{id:'history',label:'📋 My Leaves'}];
+  tabs.forEach(function(t){
+    var btn=document.createElement('button');btn.className='nav-tab';btn.textContent=t.label;
+    btn.onclick=function(){showPage(t.id);};btn.id='nav-'+t.id;nav.appendChild(btn);
+  });
+}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active');});
+  var page=document.getElementById('page-'+id);var tab=document.getElementById('nav-'+id);
+  if(page)page.classList.add('active');if(tab)tab.classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='home')buildHomePage();if(id==='apply')buildApplyPage();
+  if(id==='history')buildHistoryPage();if(id==='admin')buildAdminPage();
+}
+function buildHomePage(){
+  var el=document.getElementById('page-home');
+  el.innerHTML='<div class="content"><div class="page-header"><h2>Welcome back, '+SESSION.name+' 👋</h2><p>'+SESSION.department+' • '+SESSION.companyName+'</p></div><div id="homeBalance"></div><div class="home-grid"><button class="action-card ac-blue" onclick="showPage(\'apply\')"><div class="ac-icon">📝</div><h3>Apply for Leave</h3><p>Submit a new leave request — full day or half day</p></button><button class="action-card ac-green" onclick="showPage(\'history\')"><div class="ac-icon">📋</div><h3>My Leave History</h3><p>View all your past and pending applications</p></button></div><div class="card"><div class="card-header"><div class="card-title">📌 Quick Guide</div></div><div style="display:grid;gap:12px">'+guideRow('📝','Apply Leave','Select leave type → pick dates → enter reason → submit')+guideRow('📋','Track Status','Check My Leaves tab to see Pending / Approved / Rejected')+guideRow('⚖️','Balance','Your leave balance is shown on the Apply Leave page')+guideRow('🕐','Half Day','Select "Half Day" — counts as 0.5 days')+guideRow('🚫','Cancel','Cancel a Pending request from My Leaves')+'</div></div></div>';
+  loadHomeBalance();
+}
+function guideRow(icon,title,text){return '<div style="display:flex;gap:12px;align-items:flex-start"><span style="font-size:20px;flex-shrink:0;margin-top:2px">'+icon+'</span><div><strong style="font-size:14px;color:var(--gray-800)">'+title+'</strong><p style="font-size:13px;color:var(--gray-500);margin-top:2px">'+text+'</p></div></div>';}
+function loadHomeBalance(){
+  api('getLeaveBalance',{empId:SESSION.id}).then(function(b){
+    if(!b)return;var el=document.getElementById('homeBalance');if(!el)return;
+    el.innerHTML='<div class="balance-card" style="display:block"><div class="bc-name">Your Leave Balance — '+new Date().getFullYear()+'</div><div class="bal-nums"><div class="bal-num-item"><div class="bal-n">'+b.total+'</div><div class="bal-l">Total</div></div><div class="bal-num-item"><div class="bal-n">'+b.used+'</div><div class="bal-l">Used</div></div><div class="bal-num-item"><div class="bal-n">'+b.remaining+'</div><div class="bal-l">Remaining</div></div></div></div>';
+  }).catch(function(){});
+}
+var _employees=[],_empLoaded=false;
+function buildApplyPage(){
+  var today=new Date().toISOString().split('T')[0];
+  var el=document.getElementById('page-apply');
+  var empSelector='';
+  if(SESSION.role==='admin'){empSelector='<div class="fg"><label>Employee <span class="req">*</span></label><select class="fi" id="empSelect" onchange="onEmpChange()"><option value="">-- Select Employee --</option></select></div>';}
+  el.innerHTML='<div class="content"><div class="page-header"><h2>Apply for Leave</h2><p>Submit a new leave request</p></div><div id="applyAlert" class="alert"></div><div id="applyBalance" class="balance-card"></div><div class="card">'+empSelector+'<div class="row2"><div class="fg"><label>Leave Type <span class="req">*</span></label><select class="fi" id="leaveType"><option>Casual Leave</option><option>Sick Leave</option><option>Earned Leave</option><option>Emergency Leave</option><option>Maternity Leave</option><option>Paternity Leave</option><option>Compensatory Off</option></select></div><div class="fg"><label>Day Type <span class="req">*</span></label><select class="fi" id="dayType" onchange="onDayTypeToggle()"><option value="Full Day">Full Day</option><option value="Half Day">Half Day (0.5 days)</option></select></div></div><div id="fullDates" class="row2"><div class="fg"><label>From Date <span class="req">*</span></label><input type="date" class="fi" id="fromDate" value="'+today+'"></div><div class="fg"><label>To Date <span class="req">*</span></label><input type="date" class="fi" id="toDate" value="'+today+'"></div></div><div id="halfDateWrap" style="display:none"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" class="fi" id="singleDate" value="'+today+'"></div></div><div class="fg"><label>Reason <span class="req">*</span></label><textarea class="fi" id="reason" placeholder="Brief reason..."></textarea></div><button class="btn btn-primary" id="submitBtn" onclick="submitLeave()">Submit Leave Application</button></div></div>';
+  if(SESSION.role==='admin'){if(!_empLoaded)loadEmployeeList();else populateEmpDropdown();}
+  else loadApplyBalance(SESSION.id);
+}
+function loadEmployeeList(){startLoad();api('getEmployees',{}).then(function(list){stopLoad();_employees=list||[];_empLoaded=true;populateEmpDropdown();}).catch(function(){stopLoad();});}
+function populateEmpDropdown(){var sel=document.getElementById('empSelect');if(!sel)return;sel.innerHTML='<option value="">-- Select Employee --</option>';_employees.forEach(function(e){sel.innerHTML+='<option value="'+e.id+'">'+e.name+' ('+e.department+')</option>';});}
+function onEmpChange(){var id=document.getElementById('empSelect').value;if(!id){document.getElementById('applyBalance').style.display='none';return;}loadApplyBalance(id);}
+function loadApplyBalance(id){
+  api('getLeaveBalance',{empId:id}).then(function(b){
+    var el=document.getElementById('applyBalance');if(!el)return;
+    if(!b){el.style.display='none';return;}
+    el.style.display='block';
+    el.innerHTML='<div class="bc-name">'+b.name+' — Leave Balance '+new Date().getFullYear()+'</div><div class="bal-nums"><div class="bal-num-item"><div class="bal-n">'+b.total+'</div><div class="bal-l">Total</div></div><div class="bal-num-item"><div class="bal-n">'+b.used+'</div><div class="bal-l">Used</div></div><div class="bal-num-item"><div class="bal-n">'+b.remaining+'</div><div class="bal-l">Remaining</div></div></div>';
+  }).catch(function(){});
+}
+function onDayTypeToggle(){var half=document.getElementById('dayType').value==='Half Day';document.getElementById('fullDates').style.display=half?'none':'';document.getElementById('halfDateWrap').style.display=half?'':'none';}
+function submitLeave(){
+  var empId=SESSION.role==='admin'?(document.getElementById('empSelect')||{}).value:SESSION.id;
+  var leaveType=document.getElementById('leaveType').value;
+  var dayType=document.getElementById('dayType').value;
+  var reason=document.getElementById('reason').value.trim();
+  var fromDate,toDate;
+  if(dayType==='Half Day'){fromDate=document.getElementById('singleDate').value;toDate=fromDate;}
+  else{fromDate=document.getElementById('fromDate').value;toDate=document.getElementById('toDate').value;}
+  if(!empId)return showAlert('applyAlert','Please select an employee.','error');
+  if(!fromDate||!toDate)return showAlert('applyAlert','Please select dates.','error');
+  if(!reason)return showAlert('applyAlert','Please enter a reason for leave.','error');
+  var btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Submitting...';startLoad();
+  api('applyLeave',{fd:{employeeId:empId,leaveType:leaveType,dayType:dayType,fromDate:fromDate,toDate:toDate,reason:reason}})
+    .then(function(r){
+      stopLoad();btn.disabled=false;btn.textContent='Submit Leave Application';
+      if(r.success){showAlert('applyAlert','✅ '+r.message,'success');document.getElementById('reason').value='';if(SESSION.role==='admin'){document.getElementById('empSelect').value='';document.getElementById('applyBalance').style.display='none';}else loadApplyBalance(SESSION.id);}
+      else showAlert('applyAlert','❌ '+r.message,'error');
+    }).catch(function(){stopLoad();btn.disabled=false;btn.textContent='Submit Leave Application';showAlert('applyAlert','Connection error. Try again.','error');});
+}
+function buildHistoryPage(){
+  var el=document.getElementById('page-history');
+  el.innerHTML='<div class="content"><div class="page-header"><h2>My Leave History</h2><p>All your leave applications</p></div><div id="histAlert" class="alert"></div><div class="filter-bar"><label>Filter:</label><select id="histFilter" onchange="loadMyLeaves()"><option value="All">All Requests</option><option value="Pending">⏳ Pending</option><option value="Approved">✅ Approved</option><option value="Rejected">❌ Rejected</option><option value="Cancelled">🚫 Cancelled</option></select><button class="btn-refresh" onclick="loadMyLeaves()">🔄 Refresh</button></div><div id="histTable"></div></div>';
+  loadMyLeaves();
+}
+function loadMyLeaves(){
+  var filter=document.getElementById('histFilter')?document.getElementById('histFilter').value:'All';
+  document.getElementById('histTable').innerHTML='<div class="empty-state"><div class="es-icon">⏳</div><p>Loading...</p></div>';
+  startLoad();
+  api('getMyLeaves',{empId:SESSION.id}).then(function(rows){stopLoad();renderMyLeaves(rows,filter);}).catch(function(){stopLoad();document.getElementById('histTable').innerHTML='<div class="empty-state"><p>Connection error. Please refresh.</p></div>';});
+}
+function renderMyLeaves(rows,filter){
+  var filtered=filter==='All'?rows:rows.filter(function(r){return r.status===filter;});
+  if(!filtered||filtered.length===0){document.getElementById('histTable').innerHTML='<div class="empty-state"><div class="es-icon">📋</div><p>No leave records found</p><small>Apply for leave using the Apply Leave tab</small></div>';return;}
+  var html='<div class="tbl-wrap"><table><thead><tr><th>Record ID</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Type</th><th>Reason</th><th>Applied</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+  filtered.forEach(function(r){
+    var bc='b-'+(r.status||'').toLowerCase().replace(' ','');
+    var canCancel=r.status==='Pending';
+    html+='<tr><td><strong>'+r.recordId+'</strong></td><td>'+r.leaveType+'</td><td style="white-space:nowrap">'+r.fromDate+'</td><td style="white-space:nowrap">'+r.toDate+'</td><td><strong>'+r.totalDays+'</strong></td><td>'+r.dayType+'</td><td style="max-width:130px;word-break:break-word">'+r.reason+'</td><td style="white-space:nowrap">'+r.appliedOn+'</td><td><span class="badge '+bc+'">'+r.status+'</span></td><td>'+(canCancel?'<button class="btn-sm btn-cancel-leave" onclick="cancelMyLeave(\''+r.recordId+'\')">Cancel</button>':(r.approvedBy?'<small style="color:var(--gray-400)">By: '+r.approvedBy+'</small>':'<small style="color:var(--gray-400)">—</small>'))+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('histTable').innerHTML=html;
+}
+function cancelMyLeave(recordId){
+  if(!confirm('Cancel leave request '+recordId+'?'))return;
+  startLoad();
+  api('cancelLeave',{recordId:recordId,empId:SESSION.id}).then(function(r){stopLoad();if(r.success){showAlert('histAlert',r.message,'success');loadMyLeaves();}else showAlert('histAlert',r.message,'error');}).catch(function(){stopLoad();showAlert('histAlert','Connection error. Try again.','error');});
+}
+function buildAdminPage(){
+  var el=document.getElementById('page-admin');
+  el.innerHTML='<div class="content wide"><div style="padding-top:24px"><div id="adminAlert" class="alert" style="margin-bottom:16px"></div><div class="stats-row"><div class="stat-card"><div class="sv sv-all" id="sAll">-</div><div class="sl">Total</div></div><div class="stat-card"><div class="sv sv-pend" id="sPend">-</div><div class="sl">⏳ Pending</div></div><div class="stat-card"><div class="sv sv-appr" id="sAppr">-</div><div class="sl">✅ Approved</div></div><div class="stat-card"><div class="sv sv-rej" id="sRej">-</div><div class="sl">❌ Rejected</div></div></div><div id="todayStrip"></div><div class="filter-bar"><label>Show:</label><select id="adminFilter" onchange="loadAdminLeaves()"><option value="Pending">⏳ Pending</option><option value="Approved">✅ Approved</option><option value="Rejected">❌ Rejected</option><option value="Cancelled">🚫 Cancelled</option><option value="All">All Records</option></select><button class="btn-refresh" onclick="loadAdminLeaves()">🔄 Refresh</button><button class="btn-outline" onclick="showPage(\'apply\')">+ Apply for Employee</button></div><div id="adminTable"></div></div></div>';
+  loadAdminLeaves();loadAdminDashboard();
+}
+function loadAdminDashboard(){
+  api('getDashboardData',{}).then(function(d){
+    document.getElementById('sAll').textContent=d.total;document.getElementById('sPend').textContent=d.pending;
+    document.getElementById('sAppr').textContent=d.approved;document.getElementById('sRej').textContent=d.rejected;
+    var strip=document.getElementById('todayStrip');if(!strip)return;
+    if(d.onLeaveToday.length===0){strip.innerHTML='<div class="today-strip" style="background:linear-gradient(135deg,#374151,#4b5563)"><div><div class="ts-title">On Leave Today</div><div style="font-size:15px;font-weight:700;color:white">No one on leave today ✅</div></div><div class="ts-count">0</div></div>';}
+    else{var chips=d.onLeaveToday.map(function(p){return'<span class="chip">'+p.name+' · '+p.type+'</span>';}).join('');strip.innerHTML='<div class="today-strip"><div style="flex:1"><div class="ts-title">On Leave Today</div><div class="chip-row">'+chips+'</div></div><div class="ts-count">'+d.onLeaveToday.length+'</div></div>';}
+  }).catch(function(){});
+}
+function loadAdminLeaves(){
+  var filter=document.getElementById('adminFilter')?document.getElementById('adminFilter').value:'Pending';
+  document.getElementById('adminTable').innerHTML='<div class="empty-state"><div class="es-icon">⏳</div><p>Loading...</p></div>';
+  startLoad();
+  api('getAllLeaves',{filter:filter}).then(function(rows){stopLoad();renderAdminTable(rows);loadAdminDashboard();}).catch(function(){stopLoad();document.getElementById('adminTable').innerHTML='<div class="empty-state"><p>Connection error. Please refresh.</p></div>';});
+}
+function renderAdminTable(rows){
+  if(!rows||rows.length===0){document.getElementById('adminTable').innerHTML='<div class="empty-state"><div class="es-icon">📭</div><p>No records found</p><small>Change the filter above</small></div>';return;}
+  var html='<div class="tbl-wrap"><table><thead><tr><th>Record ID</th><th>Employee</th><th>Dept</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Type</th><th>Reason</th><th>Applied</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var bc='b-'+(r.status||'').toLowerCase();
+    var actions=r.status==='Pending'?'<div style="display:flex;gap:5px"><button class="btn-sm btn-approve" onclick="openModal(\''+r.recordId+'\',\'Approved\')">✅ Approve</button><button class="btn-sm btn-reject" onclick="openModal(\''+r.recordId+'\',\'Rejected\')">❌ Reject</button></div>':'<small style="color:var(--gray-400)">'+(r.approvedBy?'By: '+r.approvedBy:'—')+'</small>';
+    html+='<tr><td><strong>'+r.recordId+'</strong></td><td>'+r.name+'<br><small style="color:var(--gray-400)">'+r.employeeId+'</small></td><td>'+r.department+'</td><td>'+r.leaveType+'</td><td style="white-space:nowrap">'+r.fromDate+'</td><td style="white-space:nowrap">'+r.toDate+'</td><td><strong>'+r.totalDays+'</strong></td><td>'+r.dayType+'</td><td style="max-width:130px;word-break:break-word">'+r.reason+'</td><td style="white-space:nowrap">'+r.appliedOn+'</td><td><span class="badge '+bc+'">'+r.status+'</span></td><td>'+actions+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('adminTable').innerHTML=html;
+}
+function openModal(recordId,action){
+  _recordId=recordId;_action=action;
+  document.getElementById('modalTitle').textContent=(action==='Approved'?'✅ Approve':'❌ Reject')+' Leave — '+recordId;
+  var btn=document.getElementById('confirmBtn');
+  btn.style.background=action==='Approved'?'var(--green)':'var(--red)';btn.style.color='#fff';
+  btn.textContent=action==='Approved'?'Confirm Approve':'Confirm Reject';btn.disabled=false;
+  document.getElementById('approverName').value='';document.getElementById('modalRemarks').value='';
+  document.getElementById('modalOverlay').classList.add('show');
+  setTimeout(function(){document.getElementById('approverName').focus();},100);
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
+function doModalAction(){
+  var name=document.getElementById('approverName').value.trim();
+  var remarks=document.getElementById('modalRemarks').value.trim();
+  if(!name){document.getElementById('approverName').style.borderColor='var(--red)';document.getElementById('approverName').focus();return;}
+  document.getElementById('approverName').style.borderColor='';
+  var btn=document.getElementById('confirmBtn');btn.disabled=true;btn.textContent='Processing...';startLoad();
+  api('updateLeaveStatus',{recordId:_recordId,newStatus:_action,approvedBy:name,remarks:remarks})
+    .then(function(r){stopLoad();closeModal();btn.disabled=false;if(r.success){showAlert('adminAlert',r.message,'success');loadAdminLeaves();}else showAlert('adminAlert',r.message,'error');})
+    .catch(function(){stopLoad();closeModal();btn.disabled=false;showAlert('adminAlert','Connection error. Try again.','error');});
+}
+function showAlert(id,msg,type){
+  var el=document.getElementById(id);if(!el)return;
+  var icon=type==='success'?'✅':type==='error'?'❌':'ℹ️';
+  el.className='alert alert-'+type+' show';
+  el.innerHTML='<span class="alert-icon">'+icon+'</span><span>'+msg+'</span>';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(type==='success')setTimeout(function(){el.classList.remove('show');},7000);
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    if(loginRole==='employee'&&document.getElementById('formEmployee').classList.contains('show'))doLogin('employee');
+    else if(loginRole==='admin'&&document.getElementById('formAdmin').classList.contains('show'))doLogin('admin');
+  }
+});
+</script>
 </body>
 </html>
