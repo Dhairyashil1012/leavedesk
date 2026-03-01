@@ -1,46 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>LeaveDesk</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #1a73e8;
+      background: #1e3a5f;
     }
-    #loader {
+
+    /* ── SPLASH SCREEN ── */
+    #splash {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #1a73e8;
+      inset: 0;
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #7c3aed 100%);
       display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    #splash.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 44px 40px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+
+    .splash-icon {
+      width: 72px;
+      height: 72px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+      50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    }
+
+    .splash-title {
       color: white;
-      font-family: Arial, sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin-bottom: 6px;
     }
-    .logo { font-size: 56px; margin-bottom: 16px; }
-    .title { font-size: 26px; font-weight: bold; margin-bottom: 8px; }
-    .sub { font-size: 14px; opacity: 0.8; margin-bottom: 30px; }
-    .spinner {
-      width: 44px; height: 44px;
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top: 4px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+
+    .splash-sub {
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin-bottom: 32px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    iframe {
+
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      width: 0%;
+      animation: load 2.5s ease forwards;
+    }
+
+    @keyframes load {
+      0%   { width: 0%; }
+      40%  { width: 60%; }
+      70%  { width: 80%; }
+      90%  { width: 92%; }
+      100% { width: 92%; }
+    }
+
+    .splash-status {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* ── ERROR STATE ── */
+    #errorBox {
+      display: none;
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #errorBox p {
+      color: #fca5a5;
+      font-size: 13px;
+      font-family: system-ui, sans-serif;
+      margin-bottom: 12px;
+    }
+
+    #errorBox a {
+      display: inline-block;
+      background: white;
+      color: #1e3a5f;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: system-ui, sans-serif;
+    }
+
+    /* ── IFRAME ── */
+    #appFrame {
+      position: fixed;
+      inset: 0;
       width: 100%;
       height: 100%;
       border: none;
@@ -50,73 +152,78 @@
 </head>
 <body>
 
-  <!-- Loading Screen -->
-  <div id="loader">
-    <div class="logo">🗓️</div>
-    <div class="title">LeaveDesk</div>
-    <div class="sub">Loading your workspace...</div>
-    <div class="spinner"></div>
+  <!-- Splash screen shown while app loads -->
+  <div id="splash">
+    <div class="splash-card">
+      <div class="splash-icon">🗓️</div>
+      <div class="splash-title">LeaveDesk</div>
+      <div class="splash-sub">Employee Holiday Management</div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="splash-status" id="statusText">Connecting to workspace...</div>
+
+      <!-- Error fallback shown if iframe fails -->
+      <div id="errorBox">
+        <p>Having trouble loading? Tap below to open directly.</p>
+        <a id="directLink" href="#" target="_blank">Open LeaveDesk App</a>
+      </div>
+    </div>
   </div>
 
-  <!-- App loads here inside iframe -->
+  <!-- The actual app runs here — Google Drive CANNOT intercept this -->
   <iframe
     id="appFrame"
     src="https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec"
-    onload="document.getElementById('loader').style.display='none'"
-    allow="same-origin; fullscreen"
-    allowfullscreen>
+    allow="same-origin"
+    allowfullscreen
+    onload="onAppLoaded()"
+    onerror="onAppError()">
   </iframe>
+
+  <script>
+    var APP_URL = "https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec";
+    var loaded  = false;
+    var timeout = null;
+
+    // Set the fallback direct link
+    document.getElementById('directLink').href = APP_URL;
+
+    // Called when iframe finishes loading
+    function onAppLoaded() {
+      if (loaded) return;
+      loaded = true;
+      clearTimeout(timeout);
+
+      document.getElementById('statusText').textContent = 'Ready!';
+      document.getElementById('progressBar').style.animation = 'none';
+      document.getElementById('progressBar').style.width = '100%';
+
+      // Hide splash after short delay so progress bar completes
+      setTimeout(function () {
+        document.getElementById('splash').classList.add('hide');
+        // Remove splash from DOM after fade
+        setTimeout(function () {
+          var s = document.getElementById('splash');
+          if (s) s.remove();
+        }, 600);
+      }, 400);
+    }
+
+    // Called if iframe fails
+    function onAppError() {
+      document.getElementById('statusText').textContent = 'Connection issue';
+      document.getElementById('errorBox').style.display = 'block';
+    }
+
+    // Show error fallback if app takes too long (15 seconds)
+    timeout = setTimeout(function () {
+      if (!loaded) {
+        document.getElementById('statusText').textContent = 'Taking longer than expected...';
+        document.getElementById('errorBox').style.display = 'block';
+      }
+    }, 15000);
+  </script>
 
 </body>
 </html>
-```
-
-> ⚠️ **Replace `YOUR_DEPLOYMENT_ID`** with your actual deployment ID
-
----
-
-### Step 2: Get Your Deployment ID
-
-1. Open **Google Apps Script**
-2. Click **Deploy → Manage Deployments**
-3. Copy the URL — it looks like:
-```
-https://script.google.com/macros/s/AKfycbxXXXXXXXXXXXX/exec
-```
-4. Copy the part between `/s/` and `/exec`
-5. Paste it in the code above replacing `YOUR_DEPLOYMENT_ID`
-
----
-
-### Step 3: Commit the Changes
-
-1. Scroll down on GitHub
-2. Click **"Commit changes"**
-3. Click **"Commit directly to main"**
-4. Click **"Commit changes"** green button
-
----
-
-### Step 4: Test on Mobile
-
-1. Wait **2 minutes** for GitHub to rebuild
-2. Open Chrome on mobile
-3. Go to:
-```
-https://dhairyashil1012.github.io/leavedesk/
-```
-4. You will see the **blue loading screen** for 2-3 seconds
-5. Then LeaveDesk app opens **inside the page** — no redirect, no Drive error ✅
-
----
-
-## Why This Works
-```
-Before (redirect — BROKEN):
-GitHub Page → redirects to script.google.com 
-→ Drive app intercepts ❌
-
-After (iframe — WORKS):
-GitHub Page → loads script.google.com INSIDE itself
-→ URL stays as github.io
-→ Drive app cannot intercept ✅
