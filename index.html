@@ -1,115 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="2;url=https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec">
-  <title>LeaveDesk — Loading...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>LeaveDesk</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1a73e8;
+    }
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: #1a73e8;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      z-index: 999;
+      flex-direction: column;
       color: white;
-      text-align: center;
+      font-family: Arial, sans-serif;
     }
-    .card {
-      background: white;
-      color: #333;
-      padding: 40px 30px;
-      border-radius: 16px;
-      max-width: 320px;
-      width: 90%;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    }
-    .logo { font-size: 48px; margin-bottom: 10px; }
-    h1 { color: #1a73e8; font-size: 24px; margin-bottom: 8px; }
-    p { color: #666; font-size: 14px; margin-bottom: 20px; }
+    .logo { font-size: 56px; margin-bottom: 16px; }
+    .title { font-size: 26px; font-weight: bold; margin-bottom: 8px; }
+    .sub { font-size: 14px; opacity: 0.8; margin-bottom: 30px; }
     .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #e8f0fe;
-      border-top: 4px solid #1a73e8;
+      width: 44px; height: 44px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    a {
-      display: inline-block;
-      background: #1a73e8;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: bold;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
     }
-    a:hover { background: #1557b0; }
   </style>
 </head>
 <body>
-  <div class="card">
+
+  <!-- Loading Screen -->
+  <div id="loader">
     <div class="logo">🗓️</div>
-    <h1>LeaveDesk</h1>
-    <p>Redirecting you to the app...</p>
+    <div class="title">LeaveDesk</div>
+    <div class="sub">Loading your workspace...</div>
     <div class="spinner"></div>
-    <a href="https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec">
-      Tap here if not redirected
-    </a>
   </div>
 
-  <script>
-    // Redirect immediately via JS as backup
-    setTimeout(function() {
-      window.location.href = "https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec";
-    }, 2000);
-  </script>
+  <!-- App loads here inside iframe -->
+  <iframe
+    id="appFrame"
+    src="https://script.google.com/macros/s/AKfycbzifLQ4CaOB7T2DYUWblekg3xCFrWGKNIDyy5onOomTmHAEHkYoYujMv9NIplh6kMNgvw/exec"
+    onload="document.getElementById('loader').style.display='none'"
+    allow="same-origin; fullscreen"
+    allowfullscreen>
+  </iframe>
+
 </body>
 </html>
 ```
 
-> ⚠️ **Replace `YOUR_DEPLOYMENT_ID`** with your actual ID in **3 places** in the code above. Your full URL looks like:
-> `https://script.google.com/macros/s/AKfycbx.....xyz/exec`
-> The part between `/s/` and `/exec` is your Deployment ID.
-
-4. Scroll down, click **"Commit changes"** → **"Commit directly to main branch"** → click **"Commit changes"**
+> ⚠️ **Replace `YOUR_DEPLOYMENT_ID`** with your actual deployment ID
 
 ---
 
-### PART 4: Enable GitHub Pages
+### Step 2: Get Your Deployment ID
 
-1. In your repository, click **"Settings"** (top menu)
-2. Scroll down the left sidebar → click **"Pages"**
-3. Under **"Source"**, select:
-   - Branch: **main**
-   - Folder: **/ (root)**
-4. Click **"Save"**
-5. Wait **2-3 minutes**
-6. GitHub will show you a green banner:
-   > **"Your site is live at: `https://yourusername.github.io/leavedesk/`"**
-
----
-
-### PART 5: Test and Share
-
-1. Copy your GitHub Pages URL: `https://yourusername.github.io/leavedesk/`
-2. Open it on your mobile in Chrome
-3. It should show a loading screen for 2 seconds then automatically open your LeaveDesk app in the **same browser** — no Drive app interception
-
-**Share this GitHub Pages URL with all your employees instead of the script.google.com URL.**
-
----
-
-### How to Find Your Deployment ID
-
-1. Open your Apps Script project
+1. Open **Google Apps Script**
 2. Click **Deploy → Manage Deployments**
-3. Copy the URL shown — it looks like:
+3. Copy the URL — it looks like:
 ```
-https://script.google.com/macros/s/AKfycbxABCDEF123456.../exec
-                                   ^^^^^^^^^^^^^^^^^^^^^^^^
-                                   This whole part is your Deployment ID
+https://script.google.com/macros/s/AKfycbxXXXXXXXXXXXX/exec
+```
+4. Copy the part between `/s/` and `/exec`
+5. Paste it in the code above replacing `YOUR_DEPLOYMENT_ID`
+
+---
+
+### Step 3: Commit the Changes
+
+1. Scroll down on GitHub
+2. Click **"Commit changes"**
+3. Click **"Commit directly to main"**
+4. Click **"Commit changes"** green button
+
+---
+
+### Step 4: Test on Mobile
+
+1. Wait **2 minutes** for GitHub to rebuild
+2. Open Chrome on mobile
+3. Go to:
+```
+https://dhairyashil1012.github.io/leavedesk/
+```
+4. You will see the **blue loading screen** for 2-3 seconds
+5. Then LeaveDesk app opens **inside the page** — no redirect, no Drive error ✅
+
+---
+
+## Why This Works
+```
+Before (redirect — BROKEN):
+GitHub Page → redirects to script.google.com 
+→ Drive app intercepts ❌
+
+After (iframe — WORKS):
+GitHub Page → loads script.google.com INSIDE itself
+→ URL stays as github.io
+→ Drive app cannot intercept ✅
